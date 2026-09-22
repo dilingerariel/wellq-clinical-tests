@@ -4,6 +4,7 @@ import logging
 
 from app.config import settings
 from app.routes import clinical_tests
+from app.database import connect_to_mongo, close_mongo_connection
 
 # Logging
 logging.basicConfig(level=logging.INFO)
@@ -15,6 +16,14 @@ app = FastAPI(
     description="API para carga y gestión de exámenes médicos",
     version="1.0.0",
 )
+
+@app.on_event("startup")
+def startup_db_client():
+    connect_to_mongo()
+
+@app.on_event("shutdown")
+def shutdown_db_client():
+    close_mongo_connection()
 
 # CORS
 app.add_middleware(
